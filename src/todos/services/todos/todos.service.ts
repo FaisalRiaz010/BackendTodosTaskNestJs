@@ -3,8 +3,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 import { Todo } from 'src/typeorm/entities/Todo';
- import { Repository } from 'typeorm';
-import { User } from 'src/typeorm/entities/User';
+ import {  Repository } from 'typeorm';
+
+
 //TypeORM Repository design pattern, each entity has its own Repository. 
 //These repositories can be obtained from the database connection
 
@@ -43,27 +44,45 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
     }
     return this.todoRepository.remove(todo);
   }
-  //pending todos by speicifc user
-  // async getallCompletedTodosByUser(userId:number):Promise <Todo[]> {
-  //   const todo= await this.todoRepository.find({where:{user:{id:userId}}})
-  //   if(todo.completed=0){
-  //   return todo;
-  //   }
-  //    }
+  
 
-
-  //update the todo task 
   
   
   //get the completed Todos by specific User
-// async completedTodosByUser(createtodos:CreateTodos):Promise<Todo[]>{
-//     const todo = await this.todoRepository.findOne({ where: { id } });
-//     if (!todo) {
-//       throw new NotFoundException('Todo not found');
-//     }
-//     todo.completed = true;
-// }
+async completedTodosByUser(userId:number):Promise <Todo[]> {
+  {
+    const todos = await this.todoRepository.find({
+      where: {
+        user: { id: userId },
+        completed: true,
+      },
+    });
+    return todos;
+  }
+  
+}
 
 
+
+
+ //findthe pending tasks by users
+ async getallPendTodosByUser(userId:number):Promise <Todo[]> {
+{
+  const todos = await this.todoRepository.find({
+    where: {
+      user: { id: userId },
+      completed: false,
+    },
+  });
+  return todos;
+}
 
 }
+  
+ 
+   }
+
+
+
+
+

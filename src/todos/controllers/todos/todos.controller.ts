@@ -49,6 +49,22 @@ export class TodosController {
   async RemoveTodo(@Param('id') id: number): Promise<Todo> {
     return this.todosService.RemoveTodo(id);
   }
-//get the task of todos accomplished by specific users 
+//get the task of todos pendings by specific users 
+@Get(':userId/pending')
+@ApiOperation({ summary: 'Pending tasks' })
+@ApiResponse({ status: 200, description: 'Returns pending todo items.', type: [Todo] })
+async getallPendTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
+  return this.todosService.getallPendTodosByUser(userId);
+}
+
+
+
+//get the completed tasks
+@Get(':userId/completed')
+@ApiOperation({ summary: 'Completed tasks' })
+@ApiResponse({ status: 200, description: 'Returns pending todo items.', type: [Todo] })
+async completedTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
+  return this.todosService.completedTodosByUser(userId);
+}
 
 }
