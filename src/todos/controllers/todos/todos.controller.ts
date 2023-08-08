@@ -18,9 +18,11 @@ export class TodosController {
   @ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
   @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
   async createTodo(
+     @Body('userId') UserId:number,
     @Body()CreateTodos,
+   
   ): Promise<Todo> {
-    return this.todosService.createTodo(CreateTodos);
+    return this.todosService.createTodo(UserId,CreateTodos);
   }
 //for check completed todos
 //use patch beacuse we just partially update the todo not fully if want fully than we use put
