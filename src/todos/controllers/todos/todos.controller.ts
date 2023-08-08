@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
@@ -16,11 +16,12 @@ export class TodosController {
   @ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
   @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
   async createTodo(
-    @Body()CreateTodos,//user id is the id of the user that want to create todo
+    @Body()CreateTodos,
   ): Promise<Todo> {
     return this.todosService.createTodo(CreateTodos);
   }
-//for check complete
+//for check completed todos
+//use patch beacuse we just partially update the todo not fully if want fully than we use put
   @Patch(':id/complete')
   @ApiOperation({ summary: 'Mark a todo item as completed' })
   @ApiParam({ name: 'id', description: 'Todo item ID', type: 'number' })//give id of the added todo as a parameter
@@ -36,7 +37,14 @@ export class TodosController {
   async getallTodosByUser(@Param('id') userId: number): Promise<Todo[]> {
     return this.todosService.getallTodosByUser(userId);
 }
-
+//delete the todo getting by id 
+@Delete(':id/delete')
+  @ApiOperation({ summary: 'Delete Todo' })
+  @ApiParam({ name: 'id', description: 'Todo item ID', type: 'number' })//give id of the added todo as a parameter
+  @ApiResponse({ status: 200, description: 'The todo item has been Deleted Successfully.', type: Todo })
+  async RemoveTodo(@Param('id') id: number): Promise<Todo> {
+    return this.todosService.RemoveTodo(id);
+  }
 //get the task of todos accomplished by specific users 
 
 }
