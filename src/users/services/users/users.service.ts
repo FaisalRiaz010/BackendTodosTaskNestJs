@@ -4,11 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
+//typeORM Repository
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        private userRepository: Repository<User>,
       ) {}
     
       async findByUsername(username: string): Promise<User | undefined> {

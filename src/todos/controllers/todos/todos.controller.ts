@@ -5,6 +5,8 @@ import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { ApiBody } from '@nestjs/swagger';
 
+// FOr swagger setup follow the link
+//https://github.com/nestjs/nest/blob/master/sample/11-swagger/src/cats/cats.controller.ts
 
 @ApiTags('todos') // Adds a tag to the Swagger  for this controller
 @Controller('todos')
