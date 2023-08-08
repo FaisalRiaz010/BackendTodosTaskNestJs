@@ -4,7 +4,7 @@ import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { ApiBody } from '@nestjs/swagger';
-import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
+
 
 @ApiTags('todos') // Adds a tag to the Swagger  for this controller
 @Controller('todos')

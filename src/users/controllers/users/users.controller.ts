@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { User } from 'src/typeorm/entities/User';
 import { UsersService } from 'src/users/services/users/users.service';
 import { ApiOperation, ApiResponse, ApiTags,ApiBody } from '@nestjs/swagger';
