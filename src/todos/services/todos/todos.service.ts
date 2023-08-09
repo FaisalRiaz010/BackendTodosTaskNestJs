@@ -45,7 +45,22 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
     return this.todoRepository.remove(todo);
   }
   
+//update
+async updateTodo(id:number,title:string):Promise<Todo>{
+  const existtodo=await this.todoRepository.findOne({ where: { id } });
+  console.log(existtodo);
+  if(!existtodo)
+{
+  throw new NotFoundException('todo not FOund');
 
+}
+
+existtodo.title=title;
+console.log(title);
+const updatetodo=await this.todoRepository.save(existtodo);
+return updatetodo;
+
+}
   
   
   //get the completed Todos by specific User
