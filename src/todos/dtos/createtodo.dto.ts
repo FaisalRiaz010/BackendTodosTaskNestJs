@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
 export class CreateTodos{
-    title: string;
-    
+    title: string; 
+    date:Date;
 }
