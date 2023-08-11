@@ -1,9 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { ApiBody } from '@nestjs/swagger';
+import { UpdateTodos } from 'src/todos/dtos/updatetitle.dto';
+import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 
 // FOr swagger setup follow the link
 //https://github.com/nestjs/nest/blob/master/sample/11-swagger/src/cats/cats.controller.ts
@@ -19,10 +21,10 @@ export class TodosController {
   @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
   async createTodo(
      @Body('userId') UserId:number,
-    @Body()CreateTodos,
+    @Body()createTodos:CreateTodos,
    
   ): Promise<Todo> {
-    return this.todosService.createTodo(UserId,CreateTodos);
+    return this.todosService.createTodo(UserId,createTodos);
   }
 //for check completed todos
 //use patch beacuse we just partially update the todo not fully if want fully than we use put
@@ -49,7 +51,21 @@ export class TodosController {
   async RemoveTodo(@Param('id') id: number): Promise<Todo> {
     return this.todosService.RemoveTodo(id);
   }
-//get the task of todos pendings by specific users 
+
+  //update
+@Put(':id/updateTodo')
+@ApiOperation({ summary: 'Update todo Title' })//in swagger show the Operation what to do
+@ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
+@ApiResponse({ status: 201, description: 'The todo item has been successfully updated.', type: Todo })//give response back
+  async updateTodo(
+     @Param('id') id:number,
+    @Body()UpdateTodos,
+   
+  ): Promise<Todo> {
+    return this.todosService.updateTodo(id,UpdateTodos.title);
+  }
+
+//get the  pendings todos by a specific users 
 @Get(':userId/pending')
 @ApiOperation({ summary: 'Pending tasks' })
 @ApiResponse({ status: 200, description: 'Returns pending todo items.', type: [Todo] })
@@ -59,7 +75,7 @@ async getallPendTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
 
 
 
-//get the completed tasks
+//get the completed todos by a user
 @Get(':userId/completed')
 @ApiOperation({ summary: 'Completed tasks' })
 @ApiResponse({ status: 200, description: 'Returns pending todo items.', type: [Todo] })

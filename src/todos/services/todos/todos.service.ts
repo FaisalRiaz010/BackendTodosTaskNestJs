@@ -2,8 +2,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
+
 import { Todo } from 'src/typeorm/entities/Todo';
  import {  Repository } from 'typeorm';
+
+
 
 
 //TypeORM Repository design pattern, each entity has its own Repository. 
@@ -18,7 +21,10 @@ export class TodosService {
 //create todo funciton for cretiing the todo by using user id after authentication user can create it
 async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
   const todo = this.todoRepository.create({ user: { id: userId }, ...createtodo });
+  console.log(todo);
+
   return this.todoRepository.save(todo);
+
 }
 
 
@@ -46,7 +52,7 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
   }
   
 //update
-async updateTodo(id:number,title:string):Promise<Todo>{
+async updateTodo(id:number,updatetitle:string):Promise<Todo>{
   const existtodo=await this.todoRepository.findOne({ where: { id } });
   console.log(existtodo);
   if(!existtodo)
@@ -54,9 +60,10 @@ async updateTodo(id:number,title:string):Promise<Todo>{
   throw new NotFoundException('todo not FOund');
 
 }
+existtodo.title=updatetitle;
 
-existtodo.title=title;
-console.log(title);
+
+console.log(updatetitle);
 const updatetodo=await this.todoRepository.save(existtodo);
 return updatetodo;
 

@@ -16,7 +16,7 @@ import { TodosModule } from './todos/todos.module';
       password: 'root',
       database: 'Todo',
       entities: [User,Todo],
-      synchronize:false,
+      synchronize:true,
     }), UsersModule, TodosModule,],
   controllers: [AppController],
   providers: [AppService],
