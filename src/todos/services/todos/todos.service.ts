@@ -1,14 +1,11 @@
 /* eslint-disable prettier/prettier */
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Queue } from 'bull';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
-
 import { Todo } from 'src/typeorm/entities/Todo';
- import {  Repository } from 'typeorm';
-
-
-
-
+import {  Repository } from 'typeorm';
 //TypeORM Repository design pattern, each entity has its own Repository. 
 //These repositories can be obtained from the database connection
 
@@ -17,7 +14,10 @@ export class TodosService {
   constructor(
     @InjectRepository(Todo)
     private todoRepository: Repository<Todo>,
+    @InjectQueue('todo') private readonly todoQueue: Queue
   ) {}
+ 
+ 
 //create todo funciton for cretiing the todo by using user id after authentication user can create it
 async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
   const todo = this.todoRepository.create({ user: { id: userId }, ...createtodo });
@@ -25,6 +25,22 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
 
   return this.todoRepository.save(todo);
 
+}
+//check for using queue to insert todo using queue and than to db
+async insertTodo( createtodo: CreateTodos): Promise<Todo> {
+  const todo = this.todoRepository.create( {...createtodo} );
+  return this.todoRepository.save(todo);
+}
+//login
+async loginTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
+  const todo = await this.todoRepository.find({where:{user:{id:userId}}});
+  if (!todo) {
+    throw new NotFoundException('User not found');
+  }
+  const todocreate = this.todoRepository.create( {...createtodo} );
+  console.log(todocreate);
+
+  return this.todoRepository.save(todocreate);
 }
 
 
@@ -42,7 +58,7 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
  const todo= await this.todoRepository.find({where:{user:{id:userId}}})
  return todo;
   }
-  //delete 
+  //delete todo by id 
   async RemoveTodo(id: number): Promise<Todo> {
     const todo = await this.todoRepository.findOne({ where: { id } });
     if (!todo) {
@@ -51,22 +67,18 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
     return this.todoRepository.remove(todo);
   }
   
-//update
+//update totdo title and date 
 async updateTodo(id:number,updatetitle:string):Promise<Todo>{
   const existtodo=await this.todoRepository.findOne({ where: { id } });
   console.log(existtodo);
   if(!existtodo)
 {
   throw new NotFoundException('todo not FOund');
-
 }
 existtodo.title=updatetitle;
-
-
 console.log(updatetitle);
 const updatetodo=await this.todoRepository.save(existtodo);
 return updatetodo;
-
 }
   
   
@@ -80,12 +92,8 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
       },
     });
     return todos;
-  }
-  
+  } 
 }
-
-
-
 
  //findthe pending tasks by users
  async getallPendTodosByUser(userId:number):Promise <Todo[]> {
@@ -98,10 +106,20 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
   });
   return todos;
 }
-
 }
-  
- 
+
+  //get all email
+  //email todos finding
+  async findUsersWithTodosAndEmails(): Promise<Todo[]> {
+    return this.todoRepository.find({
+      relations: ['user'],
+      where: {
+        user: {
+         username:(null),//logic to username where username is not null
+        },
+      },
+    });
+  } 
    }
 
 

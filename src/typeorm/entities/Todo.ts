@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 @Entity() // Add the @Entity() decorator
 export class Todo {
@@ -20,6 +20,7 @@ export class Todo {
   
     @Column({ default: false })
     completed: boolean;
+    
     //build many to one relation with user that specific user by using id create todo
     @ManyToOne(()=> User, user => user.todos)
     user: User;

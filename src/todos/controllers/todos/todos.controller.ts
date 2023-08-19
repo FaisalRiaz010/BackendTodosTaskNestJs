@@ -4,28 +4,60 @@ import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { ApiBody } from '@nestjs/swagger';
-import { UpdateTodos } from 'src/todos/dtos/updatetitle.dto';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
+import { TodoQueueService } from 'src/todos/todo-queue.service';
+import { TodoCronService } from 'src/todos/todos-cron.service';
 
 // FOr swagger setup follow the link
 //https://github.com/nestjs/nest/blob/master/sample/11-swagger/src/cats/cats.controller.ts
 
+
 @ApiTags('todos') // Adds a tag to the Swagger  for this controller
 @Controller('todos')
 export class TodosController {
-  constructor(private readonly todosService: TodosService) {}//create constructor
+  constructor(private readonly todosService: TodosService,
+    private readonly todoQueueService: TodoQueueService,
+    private readonly todoCronService: TodoCronService) {}//create constructor
 
+  
+    //Post todo by using user id for login
   @Post('addtodo')//post addtodo like /todos/addtodo
   @ApiOperation({ summary: 'Create a new todo item' })//in swagger show the Operation what to do
   @ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
   @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
   async createTodo(
+   
      @Body('userId') UserId:number,
     @Body()createTodos:CreateTodos,
    
   ): Promise<Todo> {
     return this.todosService.createTodo(UserId,createTodos);
   }
+
+  //login user and create todo
+  
+@Post(':userId/login')
+@ApiOperation({ summary: 'login Todo' })
+@ApiResponse({ status: 200, description: 'The  item has been created Successfully.', type: Todo })
+async todocreate(
+  @Param('userId') userId: number,
+@Body()createTodos:CreateTodos,
+): Promise<Todo> {
+  return this.todosService.createTodo(userId,createTodos);
+}
+//check by using redis queue
+@Post('addtodoqueue')//post addtodo like /todos/addtodo
+@ApiOperation({ summary: 'Create a new todo item' })//in swagger show the Operation what to do
+@ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
+@ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
+async insertTodo(  
+@Body()createTodos:CreateTodos) {
+   
+  // Add todo data to the Redis queue
+  await this.todoQueueService.addToQueue(createTodos);
+  return 'Todo added to queue';
+}
+
 //for check completed todos
 //use patch beacuse we just partially update the todo not fully if want fully than we use put
   @Patch(':id/complete')
@@ -74,7 +106,6 @@ async getallPendTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
 }
 
 
-
 //get the completed todos by a user
 @Get(':userId/completed')
 @ApiOperation({ summary: 'Completed tasks' })
@@ -83,4 +114,18 @@ async completedTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
   return this.todosService.completedTodosByUser(userId);
 }
 
+  
+  //Get the all users sending email alerts for pending task after eavey 5 hours
+  @Get('send-emails')
+  async sendScheduledEmails() {
+    try {
+      await this.todoCronService.sendScheduledEmails();
+      return { message: 'Emails scheduled successfully' };
+    } catch (error) {
+      return { error: 'An error occurred while sending emails' };
+    }
+  }
 }
+
+ 
+
