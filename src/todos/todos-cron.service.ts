@@ -12,25 +12,29 @@ export class TodoCronService {
     private readonly emailService: EmailService, // Inject the EmailService
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async sendScheduledEmails() {
-    const todos = await this.todosService.findUsersWithTodosAndEmails();
-  
-     for (const todo of todos) {
-      if (todo.user && todo.user.username ) {
-        //&& !todo.completed use login when need
-        const subject = 'Todo Reminder!!';
-        const text = `Please Don't forget to complete your todo: ${todo.title}`;
-  
-        await this.emailService.sendEmail(todo.user.username, subject, text);
-  
-        
-      
-  
-        console.log(`Email sent to ${todo.user.username}`);
+    try {
+      const todos = await this.todosService.findTodosWithUserEmails();
+
+      for (const todo of todos) {
+        if (todo.user.username!==('') ) {
+          const recipientEmail = todo.user.username;
+
+          // Add a check to ensure recipientEmail is not empty or undefined
+          if (recipientEmail && recipientEmail.trim() !== '') {
+            const subject = 'Todo Reminder!!';
+            const text = `Please Don't forget to complete your todo: ${todo.title}`;
+
+            await this.emailService.sendEmail(recipientEmail, subject, text);
+            console.log(`Email sent to ${recipientEmail}`);
+          } else {
+            console.warn(`Skipping todo with empty or undefined recipient email.`);
+          }
+        }
       }
+    } catch (error) {
+      console.error('Error sending emails:', error);
+      throw error;
     }
-  }
-  
-  
-}
+  }}

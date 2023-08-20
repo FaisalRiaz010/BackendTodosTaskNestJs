@@ -51,11 +51,15 @@ async todocreate(
 @ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
 @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
 async insertTodo(  
+@Param('userId') userId: number,
 @Body()createTodos:CreateTodos) {
-   
+ 
   // Add todo data to the Redis queue
-  await this.todoQueueService.addToQueue(createTodos);
-  return 'Todo added to queue';
+  await this.todoQueueService.addToQueue(userId,createTodos);
+ 
+console.log("datainserted into queue");
+console.log("Data goes to db");
+  return this.todosService.insertTodo(userId,createTodos);
 }
 
 //for check completed todos
@@ -117,14 +121,15 @@ async completedTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
   
   //Get the all users sending email alerts for pending task after eavey 5 hours
   @Get('send-emails')
-  async sendScheduledEmails() {
+  async sendScheduledEmailsManually() {
     try {
       await this.todoCronService.sendScheduledEmails();
-      return { message: 'Emails scheduled successfully' };
+      return { message: 'Emails sent successfully' };
     } catch (error) {
       return { error: 'An error occurred while sending emails' };
     }
   }
+
 }
 
  

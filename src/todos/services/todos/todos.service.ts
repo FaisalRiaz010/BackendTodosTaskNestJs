@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 import { Todo } from 'src/typeorm/entities/Todo';
-import {  Repository } from 'typeorm';
+import {  Between, IsNull, Not, Repository } from 'typeorm';
 //TypeORM Repository design pattern, each entity has its own Repository. 
 //These repositories can be obtained from the database connection
 
@@ -27,8 +27,12 @@ async createTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
 
 }
 //check for using queue to insert todo using queue and than to db
-async insertTodo( createtodo: CreateTodos): Promise<Todo> {
-  const todo = this.todoRepository.create( {...createtodo} );
+async insertTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
+  const todocheck = await this.todoRepository.find({where:{user:{id:userId}}});
+  if (!todocheck) {
+    throw new NotFoundException('User not found');
+  }
+  const todo = this.todoRepository.create({ user: { id: userId }, ...createtodo });
   return this.todoRepository.save(todo);
 }
 //login
@@ -110,16 +114,25 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
 
   //get all email
   //email todos finding
-  async findUsersWithTodosAndEmails(): Promise<Todo[]> {
-    return this.todoRepository.find({
+  async findTodosWithUserEmails(): Promise<Todo[]> {
+    const todos = await this.todoRepository.find({
       relations: ['user'],
-      where: {
-        user: {
-         username:(null),//logic to username where username is not null
-        },
-      },
-    });
-  } 
+      where:{
+        user:{
+        username:Not(''),
+      } ,// Assuming 'user' is the name of the relation to the User entity
+  }
+})
+  
+  console.log(todos);
+ 
+    return todos;
+  }
+  
+  
+
+      
+  
    }
 
 

@@ -8,10 +8,14 @@ import { CreateTodos } from './dtos/createtodo.dto';
 @Injectable()
 export class TodoQueueService {
   constructor(@InjectQueue('todo') private readonly todoQueue: Queue) {}
-//function to add the data of todod in queue and than to db
-  async addToQueue(todoData: CreateTodos) {
-    console.log('Adding item to queue:', todoData);
-    await this.todoQueue.add('insertTodo', todoData);
-    console.log("completed!");
+
+  // Function to add the data of todo in the queue
+  async addToQueue(userId: number, todoData: CreateTodos) {
+    // Add the userId to the job data
+    const jobData = { userId, ...todoData };
+
+    console.log('Adding item to queue:', jobData);
+    await this.todoQueue.add(jobData);
+    console.log('Completed!');
   }
 }
