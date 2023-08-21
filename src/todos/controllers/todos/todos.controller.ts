@@ -51,7 +51,7 @@ async todocreate(
 @ApiBody({ type: Todo, description: 'Todo object with title and userId' })//give the body to type
 @ApiResponse({ status: 201, description: 'The todo item has been successfully created.', type: Todo })//give response back
 async insertTodo(  
-@Param('userId') userId: number,
+@Body('userId') userId: number,
 @Body()createTodos:CreateTodos) {
  
   // Add todo data to the Redis queue

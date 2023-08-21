@@ -18,7 +18,8 @@ export class TodoCronService {
       const todos = await this.todosService.findTodosWithUserEmails();
 
       for (const todo of todos) {
-        if (todo.user.username!==('') ) {
+        if (todo.user.username!==('') && !todo.completed  ) //apply check for username is not null and todos are pending
+        {
           const recipientEmail = todo.user.username;
 
           // Add a check to ensure recipientEmail is not empty or undefined

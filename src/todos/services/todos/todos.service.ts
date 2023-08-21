@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 import { Todo } from 'src/typeorm/entities/Todo';
-import {  Between, IsNull, Not, Repository } from 'typeorm';
+import {  Not, Repository } from 'typeorm';
 //TypeORM Repository design pattern, each entity has its own Repository. 
 //These repositories can be obtained from the database connection
 
@@ -120,11 +120,11 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
       where:{
         user:{
         username:Not(''),
-      } ,// Assuming 'user' is the name of the relation to the User entity
+      } ,
   }
 })
   
-  console.log(todos);
+ 
  
     return todos;
   }
