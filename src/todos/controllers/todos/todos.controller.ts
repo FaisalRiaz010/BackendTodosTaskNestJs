@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
@@ -128,6 +128,15 @@ async completedTodosByUser(@Param('userId') userId: number): Promise<Todo[]> {
     } catch (error) {
       return { error: 'An error occurred while sending emails' };
     }
+  }
+  //check usng pagination keyset and offset
+  @Get('keyset')
+    async findTodosWithOffset(
+    @Query('lastId')lastId:number,//apllying query to check on limits and id check
+    @Query('limit')limit:number,
+    ): Promise<Todo[]> {
+      return this.todosService.findTodosWithOffset(lastId,limit);
+
   }
 
 }

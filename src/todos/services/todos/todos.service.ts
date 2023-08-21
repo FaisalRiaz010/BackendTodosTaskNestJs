@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 import { Todo } from 'src/typeorm/entities/Todo';
-import {  Not, Repository } from 'typeorm';
+import {  LessThan, MoreThan, Not, Repository } from 'typeorm';
 //TypeORM Repository design pattern, each entity has its own Repository. 
 //These repositories can be obtained from the database connection
 
@@ -129,7 +129,26 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
     return todos;
   }
   
-  
+  //OFSET PAGINATION
+  async findTodosWithOffset(lastId:number,limit:number):Promise<Todo[]>{
+    const todos=await this.todoRepository.find({
+      relations:['user'],
+      where:{
+       
+          id:MoreThan(lastId),
+        
+      },
+        take: limit,
+        order: {
+          id: 'ASC'
+        }
+       
+   
+    })
+    console.log(todos);
+   return todos;
+     
+  }
 
       
   
