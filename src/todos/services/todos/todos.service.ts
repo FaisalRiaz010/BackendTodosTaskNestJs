@@ -36,11 +36,23 @@ async insertTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
   return this.todoRepository.save(todo);
 }
 //login
-async loginTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
-  const todo = await this.todoRepository.find({where:{user:{id:userId}}});
-  if (!todo) {
-    throw new NotFoundException('User not found');
-  }
+async loginTodo(userId: number,password:string,createtodo: CreateTodos): Promise<Todo> {
+  const todo = await this.todoRepository.find(
+    {
+      where: {
+        user: {
+          id: userId,
+           password: password,
+          
+        },
+      },
+    });
+   
+    if (!todo) {
+      throw new NotFoundException('User not found');
+    } // Check if the password in the swagger matches the password in the database
+  
+  
   const todocreate = this.todoRepository.create( {...createtodo} );
   console.log(todocreate);
 
@@ -50,7 +62,9 @@ async loginTodo(userId: number, createtodo: CreateTodos): Promise<Todo> {
 
 //check by todo id that this todo is completed 
   async markTodoAsCompleted(id: number): Promise<Todo> {
-    const todo = await this.todoRepository.findOne({ where: { id } });
+    const todo = await this.todoRepository.findOne(
+      { where:
+         { id } });
     if (!todo) {
       throw new NotFoundException('Todo not found');
     }

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { TodosService } from 'src/todos/services/todos/todos.service';
 import { Todo } from 'src/typeorm/entities/Todo';
 import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
@@ -7,6 +7,8 @@ import { ApiBody } from '@nestjs/swagger';
 import { CreateTodos } from 'src/todos/dtos/createtodo.dto';
 import { TodoQueueService } from 'src/todos/todo-queue.service';
 import { TodoCronService } from 'src/todos/todos-cron.service';
+import { User } from 'src/typeorm/entities/User';
+import { todo } from 'node:test';
 
 // FOr swagger setup follow the link
 //https://github.com/nestjs/nest/blob/master/sample/11-swagger/src/cats/cats.controller.ts
@@ -36,15 +38,19 @@ export class TodosController {
 
   //login user and create todo
   
-@Post(':userId/login')
-@ApiOperation({ summary: 'login Todo' })
-@ApiResponse({ status: 200, description: 'The  item has been created Successfully.', type: Todo })
-async todocreate(
-  @Param('userId') userId: number,
-@Body()createTodos:CreateTodos,
-): Promise<Todo> {
-  return this.todosService.createTodo(userId,createTodos);
-}
+  @Post(':userId/login')
+  @ApiOperation({ summary: 'login Todo' })
+  @ApiResponse({ status: 200, description: 'The  item has been created Successfully.', type: Todo })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async todocreate(
+    @Param('userId') userId: number,
+    @Param('password') password: string,
+  @Body()createTodos:CreateTodos,
+  ): Promise<Todo> {
+   
+
+    return this.todosService.createTodo(userId,createTodos);
+  }
 //check by using redis queue
 @Post('addtodoqueue')//post addtodo like /todos/addtodo
 @ApiOperation({ summary: 'Create a new todo item' })//in swagger show the Operation what to do
