@@ -120,7 +120,7 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
       where:{
         user:{
         username:Not(''),
-      } ,
+      },
   }
 })
   
@@ -141,8 +141,7 @@ async completedTodosByUser(userId:number):Promise <Todo[]> {
         take: limit,
         order: {
           id: 'ASC'
-        }
-       
+        } 
    
     })
     console.log(todos);
