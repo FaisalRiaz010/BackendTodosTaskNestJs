@@ -8,15 +8,17 @@ import { Processor, Process } from '@nestjs/bull';
 
 @Processor('todo')
 export class TodoProcessor {
-  constructor(private readonly todosService:TodosService) {}
+  constructor(private readonly todosService: TodosService) {}
 
   @Process('insertTodo')
-  async insertTodo(job: Job<{data:CreateTodos,userId:number}>) {
-    console.log('Processing job:', job.data);//for queue checking
-    const{userId,data }= job.data;//store job data into variable for stroing data in db
-    await this.todosService.insertTodo(userId,data);
-    console.log('added to db sucessfully')
-    console.log('now remove data from the queue as it sucessfully added tot db');
+  async insertTodo(job: Job<{ data: CreateTodos; userId: number }>) {
+    console.log('Processing job:', job.data); //for queue checking
+    const { userId, data } = job.data; //store job data into variable for stroing data in db
+    await this.todosService.insertTodo(userId, data);
+    console.log('added to db sucessfully');
+    console.log(
+      'now remove data from the queue as it sucessfully added tot db',
+    );
     try {
       setTimeout(async () => {
         await job.remove(); // Remove the job after a delay
@@ -26,5 +28,4 @@ export class TodoProcessor {
       console.error('Error while removing job:', error);
     }
   }
-
 }

@@ -12,14 +12,14 @@ export class TodoCronService {
     private readonly emailService: EmailService, // Inject the EmailService
   ) {}
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_5_HOURS)//set 5sec fr testing 
   async sendScheduledEmails() {
     try {
       const todos = await this.todosService.findTodosWithUserEmails();
 
       for (const todo of todos) {
-        if (todo.user.username!==('') && !todo.completed  ) //apply check for username is not null and todos are pending
-        {
+        if (todo.user.username !== '' && !todo.completed) {
+          //apply check for username is not null and todos are pending
           const recipientEmail = todo.user.username;
 
           // Add a check to ensure recipientEmail is not empty or undefined
@@ -30,7 +30,9 @@ export class TodoCronService {
             await this.emailService.sendEmail(recipientEmail, subject, text);
             console.log(`Email sent to ${recipientEmail}`);
           } else {
-            console.warn(`Skipping todo with empty or undefined recipient email.`);
+            console.warn(
+              `Skipping todo with empty or undefined recipient email.`,
+            );
           }
         }
       }
@@ -38,4 +40,5 @@ export class TodoCronService {
       console.error('Error sending emails:', error);
       throw error;
     }
-  }}
+  }
+}
